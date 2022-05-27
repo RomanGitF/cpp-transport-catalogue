@@ -3,14 +3,22 @@
 #include <cmath>
 
 struct Coordinates {
-    double lat;
-    double lng;
+    Coordinates() {}
+
+    Coordinates(double _lat, double _lng)
+        :lat(_lat)
+        , lng(_lng)
+    {}
+
     bool operator==(const Coordinates& other) const {
         return lat == other.lat && lng == other.lng;
     }
     bool operator!=(const Coordinates& other) const {
         return !(*this == other);
     }
+
+    double lat=0.0;
+    double lng=0.0;
 };
 
 inline double ComputeDistance(Coordinates from, Coordinates to) {
