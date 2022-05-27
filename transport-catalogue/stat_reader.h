@@ -5,4 +5,9 @@
 
 #include <iostream>
 
-void GetInfo(transport::Catalogue& catalogue, std::istream& input);
+namespace info {
+	void Get(transport::Catalogue& catalogue, std::istream& input);
+
+	void PrintStop(const Stop& stop);
+	void PrintBus(const Bus& bus);
+}

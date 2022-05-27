@@ -12,29 +12,28 @@
 #include "geo.h"
 #include "input_reader.h"
 
+struct Stop {
+	Stop(std::string& name, double lat, double lng);
+
+	std::unordered_map<std::string_view, int> route_length__;
+	std::set<std::string_view> cross_buses__;
+	std::string name__;
+	Coordinates coordinates__;
+};
+
+struct Bus {
+	Bus(std::string& name, std::vector<Stop*> stopes, size_t CountUniqueStops, int route_length);
+
+	int route_length__ = 0;
+	double length__ = 0.0;
+	size_t UniqueStops__;
+	std::string name__;
+	std::vector<Stop*> stops__;
+};
+
 namespace transport {
 
-	struct Stop {
-		Stop(std::string& name, double lat, double lng);
-
-		std::unordered_map<std::string_view, int> route_length__;
-		std::set<std::string_view> cross_buses__;
-		std::string name__;
-		Coordinates coordinates__;
-	};
-
-	struct Bus {
-		Bus(std::string& name, std::vector<Stop*> stopes, size_t CountUniqueStops, int route_length);
-
-		int route_length__ = 0;
-		double length__ = 0.0;
-		size_t UniqueStops;
-		std::string name__;
-		std::vector<Stop*> stops__;
-	};
-
 	class Catalogue {
-
 		std::deque<Stop> stops_;
 		std::unordered_map<std::string_view, Stop*> all_stops_;
 
@@ -49,26 +48,20 @@ namespace transport {
 		void AddCrossBusesToStop(const Bus& bus);
 		void CountLenght(Bus& bus);
 
-		void PrintStopInfo(const Stop& stop) const;
-		void PrintBusInfo(const Bus& bus) const;
-
 	public:
-
 		template <typename InputReader>
 		void CatalogRequest(InputReader& request);
 		
-		void GetStopInfo(std::string_view name);
-		void GetBusInfo(std::string_view name);
+		const Stop& GetStopInfo(std::string_view name);
+		const Bus& GetBusInfo(std::string_view name);
 	};
 }
 
 template <typename InputReader>
 void transport::Catalogue::CatalogRequest(InputReader& request) {
-
 	auto* stops = request.GetRequestStops();
 	for (auto& stop : *stops) {
 		AddStop(*stop.GetName(), *stop.GetCoordinates());
-
 	}
 	for (auto& stop : *stops) {
 		AddStopRouteLength(*stop.GetName(), *stop.GetRouteLengthStop());

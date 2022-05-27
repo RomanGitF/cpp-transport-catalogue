@@ -14,6 +14,6 @@ int main() {
 	transport::Catalogue tmp;
 	tmp.CatalogRequest(request);
 
-	GetInfo(tmp, std::cin);
+	info::Get(tmp, std::cin);
 
 }

@@ -14,7 +14,7 @@ Stop::Stop(std::string& name, double lat, double lng) {
 
 Bus::Bus(std::string& name, std::vector<Stop*> stopes, size_t CountUniqueStops, int route_length) {
 	route_length__ = route_length;
-	UniqueStops = CountUniqueStops;
+	UniqueStops__ = CountUniqueStops;
 	name__ = std::move(name);
 	stops__.reserve(stopes.size());
 	for (const auto& it : stopes) {
@@ -79,44 +79,10 @@ void Catalogue::AddCrossBusesToStop(const Bus& bus) {
 	}
 }
 
-void Catalogue::GetStopInfo(std::string_view name) {
-	try {
-		Stop& stop = *all_stops_.at(name);
-		PrintStopInfo(stop);
-	}
-	catch (std::out_of_range const& exc) {
-		std::cout << "Stop " << name << ": not found" << std::endl;
-	}
+const Stop& Catalogue::GetStopInfo(std::string_view name) {
+	return *all_stops_.at(name);
 }
 
-void Catalogue::GetBusInfo(std::string_view name) {
-	try {
-		Bus& bus = *all_buses_.at(name);
-		PrintBusInfo(bus);
-	}
-	catch (std::out_of_range const& exc) {
-		std::cout << "Bus " << name << ": not found" << std::endl;
-	}
-}
-
-void Catalogue::PrintStopInfo(const Stop& stop) const {
-	std::cout << "Stop " << stop.name__ << ": ";
-	if (stop.cross_buses__.empty()) {
-		std::cout << "no buses";
-	}
-	else {
-		std::cout << "buses ";
-		for (const auto& it : stop.cross_buses__) {
-			std::cout << it << ' ';
-		}
-	}
-	std::cout << std::endl;
-}
-
-void Catalogue::PrintBusInfo(const Bus& bus) const {
-	std::cout << "Bus " << bus.name__ << ": " << bus.stops__.size() << " stops on route, "
-		<< bus.UniqueStops << " unique stops, "
-		<< bus.route_length__ << " route length, "
-		<< bus.route_length__ / bus.length__ << " curvature";
-	std::cout << std::endl;
+const Bus& Catalogue::GetBusInfo(std::string_view name) {
+	return *all_buses_.at(name);
 }
