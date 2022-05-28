@@ -22,11 +22,11 @@ struct Stop {
 };
 
 struct Bus {
-	Bus(std::string& name, std::vector<Stop*> stopes, size_t CountUniqueStops, int route_length);
+	Bus(std::string& name, const std::vector<Stop*>& stopes, size_t CountUniqueStops, int route_length);
 
 	int route_length__ = 0;
 	double length__ = 0.0;
-	size_t UniqueStops__;
+	size_t unique_stops__;
 	std::string name__;
 	std::vector<Stop*> stops__;
 };
@@ -46,7 +46,7 @@ namespace transport {
 		void AddBus(std::string& name, std::list<std::string>& stops);
 		int CountRouteLength(const std::vector<Stop*>& stops) const;
 		void AddCrossBusesToStop(const Bus& bus);
-		void CountLenght(Bus& bus);
+		void CountLength(Bus& bus);
 
 	public:
 		template <typename InputReader>

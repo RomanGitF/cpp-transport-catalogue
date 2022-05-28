@@ -73,21 +73,21 @@ void InputReader::AddStop(std::string& line) {
     auto [stop, geo] = detail::Split(detail::DeleteSpace(line), ':');
     stop = detail::DeleteSpace(stop);
     auto [lat_sv, tmp_tail] = detail::Split(geo, ',');
-    auto [lng_sv, route_lenghts] = detail::Split(tmp_tail, ',');
+    auto [lng_sv, route_lengths] = detail::Split(tmp_tail, ',');
     double lat = std::stod(std::string(lat_sv));
     double lng = std::stod(std::string(lng_sv));
     Coordinates coordinates(lat, lng);
 
     std::list<std::tuple<std::string, int>> route_length;
-    while (!route_lenghts.empty()) {
-        auto [lenght, tail] = detail::Split(route_lenghts, ',');
-        pos = lenght.find_first_of('m', 0);
-        auto tmp_lenght = lenght.substr(0, pos);
-        int lnght = std::stoi(std::string(tmp_lenght));
-        pos = lenght.find_first_of(' ', pos + 2);
-        lenght = lenght.substr(pos + 1);
-        route_length.push_front({ move(std::string(lenght)), lnght });
-        route_lenghts = tail;
+    while (!route_lengths.empty()) {
+        auto [length, tail] = detail::Split(route_lengths, ',');
+        pos = length.find_first_of('m', 0);
+        auto tmp_length = length.substr(0, pos);
+        int lnght = std::stoi(std::string(tmp_length));
+        pos = length.find_first_of(' ', pos + 2);
+        length = length.substr(pos + 1);
+        route_length.push_front({ move(std::string(length)), lnght });
+        route_lengths = tail;
     }
     stops_request_.push_front({ std::string(stop), coordinates,  route_length });
 }

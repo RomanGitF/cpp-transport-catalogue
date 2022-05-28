@@ -13,7 +13,7 @@ int main() {
 
 	transport::Catalogue tmp;
 	tmp.CatalogRequest(request);
-
-	info::Get(tmp, std::cin);
+	//ostream& output(cout);
+	info::Get(tmp, cin, cout);
 
 }

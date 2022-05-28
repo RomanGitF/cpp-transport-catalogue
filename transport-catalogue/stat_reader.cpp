@@ -1,6 +1,6 @@
 #include "stat_reader.h"
 
-void info::Get(transport::Catalogue& catalogue, std::istream& input) {
+void info::Get(transport::Catalogue& catalogue, std::istream& input, std::ostream& output) {
 	std::string line;
 	std::getline(input, line);
 	int count = stoi(line);
@@ -10,43 +10,43 @@ void info::Get(transport::Catalogue& catalogue, std::istream& input) {
 			line = line.substr(4);
 			try {
 				const Bus& bus = catalogue.GetBusInfo(line);
-				info::PrintBus(bus);
+				info::PrintBus(bus, output);
 			}
 			catch (std::out_of_range const& exc) {
-				std::cout << "Bus " << line << ": not found" << std::endl;
+				output << "Bus " << line << ": not found" << std::endl;
 			}
 		}	
 		else if (line[0] == 'S') {
 			line = line.substr(5);
 			try {
 				const Stop& stop = catalogue.GetStopInfo(line);
-				info::PrintStop(stop);
+				info::PrintStop(stop, output);
 			}
 			catch (std::out_of_range const& exc) {
-				std::cout << "Stop " << line << ": not found" << std::endl;
+				output << "Stop " << line << ": not found" << std::endl;
 			}
 		}
 	}
 }
 
-void info::PrintStop(const Stop& stop) {
-	std::cout << "Stop " << stop.name__ << ": ";
+void info::PrintStop(const Stop& stop, std::ostream& output) {
+	output << "Stop " << stop.name__ << ": ";
 	if (stop.cross_buses__.empty()) {
-		std::cout << "no buses";
+		output << "no buses";
 	}
 	else {
-		std::cout << "buses ";
+		output << "buses ";
 		for (const auto& it : stop.cross_buses__) {
-			std::cout << it << ' ';
+			output << it << ' ';
 		}
 	}
-	std::cout << std::endl;
+	output << std::endl;
 }
 
-void info::PrintBus(const Bus& bus){
-	std::cout << "Bus " << bus.name__ << ": " << bus.stops__.size() << " stops on route, "
-		<< bus.UniqueStops__ << " unique stops, "
+void info::PrintBus(const Bus& bus, std::ostream& output){
+	output << "Bus " << bus.name__ << ": " << bus.stops__.size() << " stops on route, "
+		<< bus.unique_stops__ << " unique stops, "
 		<< bus.route_length__ << " route length, "
 		<< bus.route_length__ / bus.length__ << " curvature";
-	std::cout << std::endl;
+	output << std::endl;
 }

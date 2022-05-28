@@ -12,9 +12,9 @@ Stop::Stop(std::string& name, double lat, double lng) {
 	coordinates__.lng = lng;
 }
 
-Bus::Bus(std::string& name, std::vector<Stop*> stopes, size_t CountUniqueStops, int route_length) {
+Bus::Bus(std::string& name, const std::vector<Stop*>& stopes, size_t count_unique_stops, int route_length) {
 	route_length__ = route_length;
-	UniqueStops__ = CountUniqueStops;
+	unique_stops__ = count_unique_stops;
 	name__ = std::move(name);
 	stops__.reserve(stopes.size());
 	for (const auto& it : stopes) {
@@ -46,7 +46,7 @@ void Catalogue::AddBus(std::string& name, std::list<std::string>& stops) {
 	}
 	int route_length = CountRouteLength(stops__);
 	Bus tmp(name, stops__, uniq_stop.size(), route_length);
-	CountLenght(tmp);
+	CountLength(tmp);
 	buses_.push_back(std::move(tmp));
 	std::string_view name_bus = buses_.back().name__;
 	AddCrossBusesToStop(buses_.back());
@@ -66,7 +66,7 @@ int Catalogue::CountRouteLength(const std::vector<Stop*>& stops) const {
 	return result;
 }
 
-void Catalogue::CountLenght(Bus& bus) {
+void Catalogue::CountLength(Bus& bus) {
 	for (size_t i = 1; i < bus.stops__.size(); ++i) {
 		bus.length__ += ComputeDistance(bus.stops__[i - 1]->coordinates__, bus.stops__[i]->coordinates__);
 	}
