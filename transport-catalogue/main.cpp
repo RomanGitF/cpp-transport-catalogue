@@ -1,19 +1,18 @@
-#include <iostream>
 
-#include "transport_catalogue.h"
-#include "input_reader.h"
-#include "stat_reader.h"
+#include "json.h"
+#include "json_reader.h"
+#include "request_handler.h"
 
-using namespace std;
+#include "map_renderer.h"
 
 int main() {
 
-	InputReader request;
-	request.ReadRequest(std::cin);
-
-	transport::Catalogue tmp;
-	tmp.CatalogRequest(request);
-	//ostream& output(cout);
-	info::Get(tmp, cin, cout);
-
+    //заменил несортированый словарь на обычный в каталоге
+    JSON_Reader input(std::cin);
+    transport::Catalogue cat;
+    cat.CatalogRequest(input);
+    MapRender rend(input.GetRenderSetting());
+    RequestHandler handler(cat, rend);
+    handler.GetStat(input.GetRequestStat(), std::cout);
+    return 0;
 }
