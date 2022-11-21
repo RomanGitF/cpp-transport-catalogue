@@ -1,11 +1,11 @@
 #include "json_reader.h"
 
-JSON_Reader::JSON_Reader(std::istream& input) {
+JSONReader::JSONReader(std::istream& input) {
 	input_ = json::Load(input);
 	Load();
 }
 
-void JSON_Reader::Load() {
+void JSONReader::Load() {
 	const auto& requests = input_.GetRoot().AsMap();
 	try {
 		const auto& base = requests.at("base_requests").AsArray();
@@ -35,7 +35,7 @@ void JSON_Reader::Load() {
 	}
 }
 
-std::list<StopRequest> JSON_Reader::GetRequestStops() {
+std::list<StopRequest> JSONReader::GetRequestStops() {
 	std::list<StopRequest> stops_request;
 	for (const auto& stop : stops_) {
 		std::string_view name = stop->at("name").AsString();
@@ -49,7 +49,7 @@ std::list<StopRequest> JSON_Reader::GetRequestStops() {
 	return stops_request;
 }
 
-JSON_Reader::Request_Buses JSON_Reader::GetRequestBuses() {
+JSONReader::Request_Buses JSONReader::GetRequestBuses() {
 	Request_Buses buses_request;
 	for (const auto& bus : buses_) {
 		std::string_view name = bus->at("name").AsString();
@@ -64,10 +64,10 @@ JSON_Reader::Request_Buses JSON_Reader::GetRequestBuses() {
 	return buses_request;
 }
 
-std::list<const json::Dict*>& JSON_Reader::GetRequestStat() {
+std::list<const json::Dict*>& JSONReader::GetRequestStat() {
 	return stats_;
 }
 
-json::Dict JSON_Reader::GetRenderSetting() {
+json::Dict JSONReader::GetRenderSetting() {
 	return input_.GetRoot().AsMap().at("render_settings").AsMap();
 }

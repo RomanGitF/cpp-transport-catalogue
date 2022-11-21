@@ -8,7 +8,7 @@
 #include <list>
 //#include <memory>
 
-class JSON_Reader {
+class JSONReader {
 	using Request_Buses = std::list<std::tuple<std::string_view, std::list<std::string_view>, bool>>;
 
 	json::Document input_;
@@ -21,7 +21,7 @@ class JSON_Reader {
 
 public:
 
-	JSON_Reader(std::istream& input);
+	JSONReader(std::istream& input);
 
 	std::list<StopRequest> GetRequestStops();
 	Request_Buses GetRequestBuses();

@@ -18,63 +18,61 @@
 inline const double EPSILON = 1e-6;
 bool IsZero(double value);
 
-class SphereProjector {
-public:
-
-    template <typename PointInputIt>
-    SphereProjector(PointInputIt points_begin, PointInputIt points_end,
-        double max_width, double max_height, double padding);
-
-    svg::Point operator()(geo::Coordinates coords) const;
-
-private:
-    double padding_;
-    double min_lon_ = 0;
-    double max_lat_ = 0;
-    double zoom_coeff_ = 0;
-};
-
+//оставил функцию вне класса, чтобы не делать ее static. 
 svg::Color ReadColor(const json::Node& node);
 
-struct SetRender {
-    double width__;
-    double heigth__;
-    double padding__;
-    double line_width__;
-    svg::Point bus_label_offset__;
-    int bus_label_font_size__;
-    double underlayer_width__;
-    double stop_radius__;
-    svg::Point stop_label_offset__;
-    double stop_label_font_size__;
-    std::list<svg::Color> color_palette__;
-    svg::Color underlayer_color__;
+class MapRenderer {
+    class SphereProjector {
+    public:
+        template <typename PointInputIt>
+        SphereProjector(PointInputIt points_begin, PointInputIt points_end,
+            double max_width, double max_height, double padding);
 
-    SetRender(const json::Dict& render_settings);
-};
+        svg::Point operator()(geo::Coordinates coords) const;
+    private:
+        double padding_;
+        double min_lon_ = 0;
+        double max_lat_ = 0;
+        double zoom_coeff_ = 0;
+    };
 
-class MapRender {
+    struct SetRender {
+        double width__;
+        double heigth__;
+        double padding__;
+        double line_width__;
+        svg::Point bus_label_offset__;
+        int bus_label_font_size__;
+        double underlayer_width__;
+        double stop_radius__;
+        svg::Point stop_label_offset__;
+        double stop_label_font_size__;
+        std::list<svg::Color> color_palette__;
+        svg::Color underlayer_color__;
+
+        SetRender(const json::Dict& render_settings);
+    };
+
     SetRender set_;
     svg::Document output_;
     SphereProjector CreatorProjector(const transport::Catalogue& catalogue);
     void DrawRoute(const std::vector<domain::Stop*> stops,
-        SphereProjector& proj, svg::Color color, bool is_round);           
+        SphereProjector& proj, svg::Color color, bool is_round); 
+    
     void DrawName(std::string_view name, svg::Point point, svg::Color color);
     void DrawNameRoute(const domain::Bus& bus, SphereProjector& proj, svg::Color color);
     void DrawSymbolStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj);
     void DrawNameStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj);
 
 public:
-    MapRender(const json::Dict& render_settings);
-
+    MapRenderer(const json::Dict& render_settings);
     void Draw(const transport::Catalogue& catalogue, std::ostream& out);
-
 };
 
 
 // points_begin и points_end задают начало и конец интервала элементов geo::Coordinates
 template <typename PointInputIt>
-SphereProjector::SphereProjector(PointInputIt points_begin, PointInputIt points_end,
+MapRenderer::SphereProjector::SphereProjector(PointInputIt points_begin, PointInputIt points_end,
     double max_width, double max_height, double padding)
     : padding_(padding) //
 {

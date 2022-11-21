@@ -1,18 +1,10 @@
 #include "map_renderer.h"
 
-svg::Point SphereProjector::operator()(geo::Coordinates coords) const {
-	return {
-		(coords.lng - min_lon_) * zoom_coeff_ + padding_,
-		(max_lat_ - coords.lat) * zoom_coeff_ + padding_
-	};
-}
-
 using namespace domain;
 
 bool IsZero(double value) {
-    return std::abs(value) < EPSILON;
+	return std::abs(value) < EPSILON;
 }
-
 
 svg::Color ReadColor(const json::Node& node) {
 	svg::Color result;
@@ -33,7 +25,16 @@ svg::Color ReadColor(const json::Node& node) {
 	return result;
 }
 
-SetRender::SetRender(const json::Dict& render_settings)
+//-----------------------MapRender
+
+svg::Point MapRenderer::SphereProjector::operator()(geo::Coordinates coords) const {
+	return {
+		(coords.lng - min_lon_) * zoom_coeff_ + padding_,
+		(max_lat_ - coords.lat) * zoom_coeff_ + padding_
+	};
+}
+
+MapRenderer::SetRender::SetRender(const json::Dict& render_settings)
 	:width__(render_settings.at("width").AsDouble()),
 	heigth__(render_settings.at("height").AsDouble()),
 	padding__(render_settings.at("padding").AsDouble()),
@@ -47,18 +48,16 @@ SetRender::SetRender(const json::Dict& render_settings)
 		render_settings.at("stop_label_offset").AsArray()[1].AsDouble()),
 	stop_label_font_size__(render_settings.at("stop_label_font_size").AsDouble())
 {
-	for (const auto& it : render_settings.at("color_palette").AsArray()) {
+	for (const json::Node& it : render_settings.at("color_palette").AsArray()) {
 		color_palette__.emplace_back(ReadColor(it));
 	}
 	underlayer_color__ = ReadColor(render_settings.at("underlayer_color"));
 }
 
-//-----------------------MapRender
-
-MapRender::MapRender(const json::Dict& render_settings)
+MapRenderer::MapRenderer(const json::Dict& render_settings)
 	:set_(render_settings) {}
 
-SphereProjector MapRender::CreatorProjector(const transport::Catalogue& catalogue) {
+MapRenderer::SphereProjector MapRenderer::CreatorProjector(const transport::Catalogue& catalogue) {
 	std::list<geo::Coordinates> coordinates;
 	for (const auto& [name, bus] : catalogue.GetAllBuses()) {
 		for (const auto& stop : bus->stops__) {
@@ -70,7 +69,7 @@ SphereProjector MapRender::CreatorProjector(const transport::Catalogue& catalogu
 	return proj;
 }
 
-void MapRender::DrawRoute(const std::vector<domain::Stop*> stops, SphereProjector& proj, svg::Color color, bool is_round) {
+void MapRenderer::DrawRoute(const std::vector<domain::Stop*> stops, SphereProjector& proj, svg::Color color, bool is_round) {
 	svg::Polyline route;
 	for (const auto& stop : stops) {
 		route.AddPoint(proj(stop->coordinates__));
@@ -90,7 +89,7 @@ void MapRender::DrawRoute(const std::vector<domain::Stop*> stops, SphereProjecto
 	output_.Add(route);
 }
 
-void MapRender::DrawName(std::string_view name, svg::Point point, svg::Color color) {
+void MapRenderer::DrawName(std::string_view name, svg::Point point, svg::Color color) {
 	svg::Text back_text;
 	back_text.SetPosition(point)
 		.SetOffset(set_.bus_label_offset__)
@@ -116,7 +115,7 @@ void MapRender::DrawName(std::string_view name, svg::Point point, svg::Color col
 	output_.Add(text);
 }
 
-void MapRender::DrawNameRoute(const domain::Bus& bus, SphereProjector& proj, svg::Color color) {
+void MapRenderer::DrawNameRoute(const domain::Bus& bus, SphereProjector& proj, svg::Color color) {
 	if (bus.stops__.empty()) {
 		return;
 	}
@@ -127,7 +126,7 @@ void MapRender::DrawNameRoute(const domain::Bus& bus, SphereProjector& proj, svg
 	}
 }
 
-void MapRender::DrawSymbolStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj) {
+void MapRenderer::DrawSymbolStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj) {
 	for (const auto& [name, stop] : stops) {
 		if (!stop->cross_buses__.empty()) {
 			svg::Circle circle;
@@ -139,7 +138,7 @@ void MapRender::DrawSymbolStop(const std::map<std::string_view, domain::Stop*>& 
 	}
 }
 
-void MapRender::DrawNameStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj) {
+void MapRenderer::DrawNameStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj) {
 	for (const auto& [name, stop] : stops) {
 		if (!stop->cross_buses__.empty()) {
 			svg::Text back_text;
@@ -167,7 +166,7 @@ void MapRender::DrawNameStop(const std::map<std::string_view, domain::Stop*>& st
 	}
 }
 
-void MapRender::Draw(const transport::Catalogue& catalogue, std::ostream& out) {
+void MapRenderer::Draw(const transport::Catalogue& catalogue, std::ostream& out) {
 
 	auto color = set_.color_palette__.begin();
 	auto last_color = set_.color_palette__.end();
