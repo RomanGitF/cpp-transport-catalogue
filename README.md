@@ -23,3 +23,25 @@
 ### Системные требования.
 
 С++17
+
+#### Заголовочные файлы.
+
+##### json.h
+Содержит класс json::Node и обертку json::Document.
+Функция Load для формирования json::Document через std::istream&.
+
+##### json_builder.h
+Содержит класс json::Builder для сконструировать json::Node, используя цепочки вызовов методов.
+Так же вспомгательные классы \*\*ItemContext для исключения ошибок на этапе компиляции.
+
+##### domain.h
+Структуры domain::stop и domain::Bus.
+
+##### geo.h
+Структура geo::Coordinates.
+
+##### json_reader.h
+Класс json::JSONReader
+
+
+
