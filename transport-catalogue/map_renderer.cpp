@@ -193,4 +193,3 @@ void MapRenderer::Draw(const transport::Catalogue& catalogue, std::ostream& out)
 	DrawNameStop(catalogue.GetAllStops(), proj);
 	output_.Render(out);
 }
-

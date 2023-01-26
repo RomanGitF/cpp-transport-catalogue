@@ -1,4 +1,5 @@
 #include "request_handler.h"
+#include "json_builder.h"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -29,9 +30,8 @@ std::list<std::tuple<std::string_view, int>> StopRequest::GetRouteLengthStop() {
     return route_length_stops_;
 }
 
-
 /////////////////////  RequestHandler
-RequestHandler::RequestHandler(transport::Catalogue& catalogue, MapRender& render)
+RequestHandler::RequestHandler(transport::Catalogue& catalogue, MapRenderer& render)
     :catalogue_(catalogue),
     render_(render)
 {}
@@ -56,16 +56,18 @@ json::Node RequestHandler::GetMap(int id) {
     using namespace std::literals;
     std::ostringstream sout;
     render_.Draw(catalogue_, sout);
-   // std::string mapa(sout.str());
-    json::Node dict_map{ json::Dict{{"map"s, sout.str()},
-                                         {"request_id"s, id} } };
-        return dict_map;
+    json::Node dict_node = json::Builder{}
+        .StartDict()
+        .Key("map"s).Value(sout.str())
+        .Key("request_id"s).Value(id)
+        .EndDict()
+        .Build();
+        return dict_node;
 }
 
 json::Node RequestHandler::GetStopStat(const json::Dict* request) {
     using namespace std::literals;
     std::optional<Stop*> stop = catalogue_.GetStopInfo(request->at("name"s).AsString());
-
     if (stop) {
         auto& info = stop.value();
         json::Array buses;
@@ -74,13 +76,23 @@ json::Node RequestHandler::GetStopStat(const json::Dict* request) {
             std::string s = it.data();
             buses.emplace_back(s);
         }
-        json::Node dict_node{ json::Dict{{"buses"s, buses},
-                                         {"request_id"s, request->at("id").AsInt()} } };
+        json::Node dict_node = json::Builder{}
+            .StartDict()
+            .Key("buses"s).Value(buses)
+            .Key("request_id"s).Value(request->at("id").AsInt())
+            .EndDict()
+            .Build();
+
         return dict_node;
     }
     else {
-        json::Node dict_node{ json::Dict{ {"error_message"s, "not found"s},
-                                          {"request_id"s, request->at("id"s).AsInt()}} };
+        json::Node dict_node = json::Builder{}
+            .StartDict()
+            .Key("error_message"s).Value("not found"s)
+            .Key("request_id"s).Value(request->at("id"s).AsInt())
+            .EndDict()
+            .Build();
+
         return dict_node;
     }
 }
@@ -93,25 +105,30 @@ json::Node RequestHandler::GetBusStat(const json::Dict* request) {
         int n = info->stops__.size();
         if (!info->is_roundtrip__ && n>1) {
             n += (n - 1);
-
         }
-        json::Node dict_node{ json::Dict{ {"curvature", info->route_length__ / info->length__},
-                                          {"route_length", info->route_length__},
-                                          {"stop_count", n},
-                                          {"unique_stop_count", static_cast<int>(info->unique_stops__)},
-                                          {"request_id", request->at("id").AsInt()}} };
+        json::Node dict_node = json::Builder{}
+            .StartDict()
+            .Key("curvature"s).Value(info->route_length__ / info->length__)
+            .Key("route_length"s).Value(info->route_length__)
+            .Key("stop_count"s).Value(n)
+            .Key("unique_stop_count"s).Value(static_cast<int>(info->unique_stops__))
+            .Key("request_id"s).Value(request->at("id").AsInt())
+            .EndDict()
+            .Build();
         return dict_node;
     }
     else {
-        json::Node dict_node{ json::Dict{ {"error_message", "not found"s},
-                                          {"request_id", request->at("id").AsInt()}} };
+        json::Node dict_node = json::Builder{}
+            .StartDict()
+            .Key("error_message"s).Value("not found"s)
+            .Key("request_id"s).Value(request->at("id").AsInt())
+            .EndDict()
+            .Build();
         return dict_node;
     }
-
 }
 
 void RequestHandler::GetStat(std::list<const json::Dict*> requests, std::ostream& out) {
     json::Document stats(StatHandler(requests));
     json::Print(stats, out);
 }
-

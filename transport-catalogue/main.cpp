@@ -1,4 +1,3 @@
-﻿
 #include "json.h"
 #include "json_reader.h"
 #include "request_handler.h"
@@ -17,7 +16,7 @@ int main() {
     transport::Catalogue cat;
     cat.CatalogRequest(input);
 
-    MapRender rend(input.GetRenderSetting());
+    MapRenderer rend(input.GetRenderSetting());
 
     RequestHandler handler(cat, rend);
 

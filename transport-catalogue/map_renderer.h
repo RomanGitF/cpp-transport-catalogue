@@ -123,4 +123,3 @@ MapRenderer::SphereProjector::SphereProjector(PointInputIt points_begin, PointIn
 }
 
 
-

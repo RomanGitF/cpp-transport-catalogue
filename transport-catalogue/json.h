@@ -3,85 +3,68 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include <vector>
 #include <variant>
+#include <vector>
 
 namespace json {
 
     class Node;
-
     using Dict = std::map<std::string, Node>;
     using Array = std::vector<Node>;
-    using Number = std::variant<int, double>;
 
     class ParsingError : public std::runtime_error {
     public:
         using runtime_error::runtime_error;
     };
-    //inline const std::string NoneData{ "null" };
-    class Node {
 
-        using Value = std::variant <std::nullptr_t, bool, int, double, std::string, Array, Dict>;
-        Value node_;
-
+    class Node final
+        : private std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string> {
     public:
+        using variant::variant;
+        using Value = variant;
 
-        Node() = default;
-        Node(std::nullptr_t);
-        Node(double value);
-        Node(bool value);
-        Node(Array array);
-        Node(Dict map);
-        Node(int value);
-        Node(Number);
-        Node(std::string value);
+        void ChangeNode(Node& node);
+        Node& AddKeyDict(std::string& key);
+        Node& AddElemArray(Node& elem);
+        bool RemoveLastElem();
 
         bool IsInt() const;
-        bool IsDouble() const;
-        bool IsPureDouble() const;
-        bool IsBool() const;
-        bool IsString() const;
-        bool IsNull() const;
-        bool IsArray() const;
-        bool IsMap() const;
-
         int AsInt() const;
-        bool AsBool() const;
+
+        bool IsPureDouble() const;
+        bool IsDouble() const;
         double AsDouble() const;
-        const std::string& AsString() const;
+
+        bool IsBool() const;
+        bool AsBool() const;
+        bool IsNull() const;
+
+        bool IsArray() const;
+
         const Array& AsArray() const;
-        const Dict& AsMap() const;
 
+        bool IsString() const;
+        const std::string& AsString() const;
+        bool IsDict() const;
+        const Dict& AsDict() const;
+
+        bool operator==(const Node& rhs) const;
         const Value& GetValue() const;
-
-        bool operator== (const Node& left) const;
-        bool operator!= (const Node& left) const;
-
     };
 
-    struct OstreamNode {
-        std::ostream& out;
-
-        void operator() (std::nullptr_t) const;
-        void operator() (double value) const;
-        void operator() (bool value) const;
-        void operator() (Array array) const;
-        void operator() (Dict map) const;
-        void operator() (int value) const;
-        void operator() (std::string value) const;
-    };
+    inline bool operator!=(const Node& lhs, const Node& rhs);
 
     class Document {
-        Node root_;
     public:
-        Document() = default;
-        Document(Node root);
+        Document() = default; 
+        explicit Document(Node root);
         const Node& GetRoot() const;
-
-        bool operator== (const Document& right) const;
-        bool operator!= (const Document& right) const;
-
+    private:
+        Node root_;
     };
+
+    inline bool operator==(const Document& lhs, const Document& rhs);
+    inline bool operator!=(const Document& lhs, const Document& rhs);
 
     Document Load(std::istream& input);
 

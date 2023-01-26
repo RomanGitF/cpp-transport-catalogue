@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string_view>
 #include <list>
-//#include <memory>
+//#include <memory> 
 
 class JSONReader {
 	using Request_Buses = std::list<std::tuple<std::string_view, std::list<std::string_view>, bool>>;
@@ -28,4 +28,3 @@ public:
 	std::list<const json::Dict*>& GetRequestStat();
 	json::Dict GetRenderSetting();
 };
-

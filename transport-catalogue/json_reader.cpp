@@ -1,20 +1,22 @@
 #include "json_reader.h"
 
+
+
 JSONReader::JSONReader(std::istream& input) {
 	input_ = json::Load(input);
 	Load();
 }
 
 void JSONReader::Load() {
-	const auto& requests = input_.GetRoot().AsMap();
+	const auto& requests = input_.GetRoot().AsDict();
 	try {
 		const auto& base = requests.at("base_requests").AsArray();
 		for (const auto& it : base) {
-			if (it.AsMap().at("type").AsString() == "Stop") {
-				stops_.emplace_front(&it.AsMap());
+			if (it.AsDict().at("type").AsString() == "Stop") {
+				stops_.emplace_front(&it.AsDict());
 			}
-			else if (it.AsMap().at("type").AsString() == "Bus") {
-				buses_.emplace_front(&it.AsMap());
+			else if (it.AsDict().at("type").AsString() == "Bus") {
+				buses_.emplace_front(&it.AsDict());
 			}
 			else {
 				std::cerr << "Error Node" << std::endl;
@@ -27,7 +29,7 @@ void JSONReader::Load() {
 	try {
 		const auto& stat = requests.at("stat_requests").AsArray();
 		for (const auto& it : stat) {
-			stats_.emplace_back(&it.AsMap());
+			stats_.emplace_back(&it.AsDict());
 		}
 	}
 	catch (std::out_of_range const& exc) {
@@ -41,7 +43,7 @@ std::list<StopRequest> JSONReader::GetRequestStops() {
 		std::string_view name = stop->at("name").AsString();
 		geo::Coordinates coordinates(stop->at("latitude").AsDouble(), stop->at("longitude").AsDouble());
 		std::list<std::tuple<std::string_view, int>> length;
-		for (const auto& other_stop : stop->at("road_distances").AsMap()) {
+		for (const auto& other_stop : stop->at("road_distances").AsDict()) {
 			length.emplace_front(other_stop.first, other_stop.second.AsInt());
 		}
 		stops_request.emplace_front(name, coordinates, length);
@@ -69,5 +71,5 @@ std::list<const json::Dict*>& JSONReader::GetRequestStat() {
 }
 
 json::Dict JSONReader::GetRenderSetting() {
-	return input_.GetRoot().AsMap().at("render_settings").AsMap();
+	return input_.GetRoot().AsDict().at("render_settings").AsDict();
 }

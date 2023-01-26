@@ -34,7 +34,7 @@ struct StatRequest {
 
 class RequestHandler {
     transport::Catalogue& catalogue_;
-    MapRender& render_;
+    MapRenderer& render_;
 
     json::Array StatHandler(std::list<const json::Dict*> requests);
     json::Node GetStopStat(const json::Dict* request);
@@ -42,6 +42,6 @@ class RequestHandler {
     json::Node GetMap(int id);
 
 public:
-    RequestHandler(transport::Catalogue& catalogue, MapRender& render);
+    RequestHandler(transport::Catalogue& catalogue, MapRenderer& render);
     void GetStat(std::list<const json::Dict*> requests, std::ostream& out);
 };
