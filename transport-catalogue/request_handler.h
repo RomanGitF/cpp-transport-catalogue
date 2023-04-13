@@ -29,9 +29,8 @@ class RequestHandler {
 
     transport::Catalogue& catalogue_;
     MapRenderer& render_;
-
-    graph::Router<double> router_;
-    transport::BusGraph& graph_;
+    transport::BusGraph graph_;
+    transport::BusRouter router_;
 
     json::Array StatHandler(std::list<const json::Dict*> requests);
     json::Node GetStopStat(const json::Dict* request);
@@ -44,6 +43,6 @@ class RequestHandler {
     json::Node GetArrayItems(const std::vector<graph::EdgeId> edges);
 public:
 
-    RequestHandler(transport::Catalogue& catalogue, MapRenderer& render, transport::BusGraph& graph);
+    RequestHandler(transport::Catalogue& catalogue, MapRenderer& render);
     void GetStat(std::list<const json::Dict*> requests, std::ostream& out);
 };

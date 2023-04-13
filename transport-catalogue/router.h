@@ -20,6 +20,7 @@ private:
     using Graph = DirectedWeightedGraph<Weight>;
 
 public:
+
     explicit Router(const Graph& graph);
 
     struct RouteInfo {

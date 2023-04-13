@@ -29,7 +29,7 @@ double BusGraph::CalcTime(const domain::Stop& stop_from, const domain::Stop& sto
 		length = stop_to.route_length__.at(stop_from.name__);
 	}
 	else { return 0.; }
-	double V = 1000.0 * setting_.bus_velocity__ / 60;
+	double V = 1.0 * MInKm * setting_.bus_velocity__ / SInH;
 	double time = 1.0 * length / V;
 	return time;
 }
@@ -56,4 +56,22 @@ void BusGraph::BuildGraph() {
 			time = setting_.bus_wait_time__;
 		}
 	}
+}
+
+////////////// class BusRouter
+BusRouter::BusRouter(const BusGraph& bus_graph)
+	:BaseRouter(bus_graph.GetGraph())
+	, bus_graph_(bus_graph)
+{}
+
+const Edge<double>& BusRouter::GetEdge(EdgeId edge_id) const {
+	return bus_graph_.GetEdge(edge_id);
+}
+
+const std::string_view BusRouter::GetNameBus(EdgeId edge_id) const {
+	return bus_graph_.GetNameBus(edge_id);
+}
+
+int BusRouter::GetSpanCount(EdgeId edge_id) const {
+	return bus_graph_.GetSpanCount(edge_id);
 }

@@ -26,12 +26,13 @@ std::list<std::tuple<std::string_view, int>> StopRequest::GetRouteLengthStop() {
 }
 
 /////////////////////  RequestHandler
-RequestHandler::RequestHandler(transport::Catalogue& catalogue, MapRenderer& render, BusGraph& graph)
+RequestHandler::RequestHandler(transport::Catalogue& catalogue, MapRenderer& render)
     :catalogue_(catalogue),
     render_(render),
-    router_(graph),
-    graph_(graph)
-{}
+    graph_(catalogue),
+    router_(graph_)
+{
+}
 
 json::Array RequestHandler::StatHandler(std::list<const json::Dict*> requests) {
     json::Array nodes;
@@ -129,7 +130,7 @@ json::Node RequestHandler::GetArrayItems(const std::vector<graph::EdgeId> edges)
     json::Array items;
 
     for (auto edge : edges) {
-        auto it = graph_.GetEdge(edge);
+        auto it = router_.GetEdge(edge);
         if (it.weight == 0)
         {
             return items;
@@ -145,8 +146,8 @@ json::Node RequestHandler::GetArrayItems(const std::vector<graph::EdgeId> edges)
             .Build();
 
         double time_for_bus = it.weight - time_for_wait;
-        string_view bus = graph_.GetNameBus(it.from);
-        int span_count = graph_.GetSpanCount(it.from);
+        string_view bus = router_.GetNameBus(it.from);
+        int span_count = router_.GetSpanCount(it.from);
         json::Node item_bus = json::Builder{}
             .StartDict()
             .Key("bus"s).Value(string(bus))
