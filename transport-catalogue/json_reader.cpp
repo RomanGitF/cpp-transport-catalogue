@@ -35,6 +35,14 @@ void JSONReader::Load() {
 	catch (std::out_of_range const& exc) {
 		std::cerr << "Error Load Stat" << std::endl;
 	}
+
+	try { 
+		settings_ = std::make_unique<json::Dict>(requests.at("routing_settings").AsDict());
+	}
+	catch (std::out_of_range const& exc) {
+		std::cerr << "Error Load Settings" << std::endl;
+	}
+
 }
 
 std::list<StopRequest> JSONReader::GetRequestStops() {
@@ -72,4 +80,13 @@ std::list<const json::Dict*>& JSONReader::GetRequestStat() {
 
 json::Dict JSONReader::GetRenderSetting() {
 	return input_.GetRoot().AsDict().at("render_settings").AsDict();
+}
+
+
+size_t  JSONReader::GetSettingsBusVelocity() {
+	return settings_.get()->at("bus_velocity").AsInt();
+}
+
+size_t  JSONReader::GetSettingsBusWaitTime() {
+	return settings_.get()->at("bus_wait_time").AsInt();
 }

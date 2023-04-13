@@ -16,10 +16,11 @@ namespace domain {
 		std::set<std::string_view> cross_buses__;
 		std::string_view name__;
 		geo::Coordinates coordinates__;
+		size_t index__;
 	};
 
 	struct Bus {
-		Bus(std::string_view name, const std::vector<Stop*>& stopes, size_t CountUniqueStops, int route_length, bool is_round);
+		Bus(std::string_view name, const std::vector<Stop*>& stopes, size_t CountUniqueStops, int route_length, bool is_round, size_t index);
 
 		int route_length__ = 0;
 		double length__ = 0.0;
@@ -27,6 +28,16 @@ namespace domain {
 		bool is_roundtrip__;
 		std::string_view name__;
 		std::vector<Stop*> stops__;
+		size_t index__;
+
+	};
+
+	struct Setting {
+		Setting();
+		Setting(size_t bus_velocity, size_t bus_wait_time);
+
+		size_t bus_velocity__ = 0;
+		size_t bus_wait_time__ = 0;
 	};
 
 } // namespace domain

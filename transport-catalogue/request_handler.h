@@ -9,7 +9,8 @@
 #include "transport_catalogue.h"
 #include "json.h"
 #include "map_renderer.h"
-
+#include "transport_router.h"
+#include "router.h"
 
 class StopRequest {
     std::string_view name_;
@@ -24,24 +25,25 @@ public:
     std::list<std::tuple<std::string_view, int>> GetRouteLengthStop();
 };
 
-struct StatRequest {
-    StatRequest(int id, std::string_view type, std::string_view name);
-
-    int id_;
-    std::string_view type_;
-    std::string_view name_;
-};
-
 class RequestHandler {
+
     transport::Catalogue& catalogue_;
     MapRenderer& render_;
+
+    graph::Router<double> router_;
+    transport::BusGraph& graph_;
 
     json::Array StatHandler(std::list<const json::Dict*> requests);
     json::Node GetStopStat(const json::Dict* request);
     json::Node GetBusStat(const json::Dict* request);
+    json::Node GetRoute(const json::Dict* request);
+
     json::Node GetMap(int id);
 
+    std::pair<size_t, size_t> FindIndexStops(std::string_view from, std::string_view to);
+    json::Node GetArrayItems(const std::vector<graph::EdgeId> edges);
 public:
-    RequestHandler(transport::Catalogue& catalogue, MapRenderer& render);
+
+    RequestHandler(transport::Catalogue& catalogue, MapRenderer& render, transport::BusGraph& graph);
     void GetStat(std::list<const json::Dict*> requests, std::ostream& out);
 };

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string_view>
 #include <list>
-//#include <memory> 
+#include <memory> 
 
 class JSONReader {
 	using Request_Buses = std::list<std::tuple<std::string_view, std::list<std::string_view>, bool>>;
@@ -16,6 +16,7 @@ class JSONReader {
 	std::list<const json::Dict*> stops_;
 	std::list<const json::Dict*> buses_;
 	std::list<const json::Dict*> stats_;
+	std::unique_ptr<json::Dict> settings_;   
 
 	void Load();
 
@@ -26,5 +27,9 @@ public:
 	std::list<StopRequest> GetRequestStops();
 	Request_Buses GetRequestBuses();
 	std::list<const json::Dict*>& GetRequestStat();
+
 	json::Dict GetRenderSetting();
+
+	size_t GetSettingsBusVelocity();
+	size_t GetSettingsBusWaitTime();
 };

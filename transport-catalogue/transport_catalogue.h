@@ -14,11 +14,14 @@
 namespace transport {
 
 	class Catalogue {
+
 		std::deque<domain::Stop> stops_;
 		std::map<std::string_view, domain::Stop*> all_stops_;
 
 		std::deque<domain::Bus> buses_;
 		std::map<std::string_view, domain::Bus*> all_buses_;
+
+		domain::Setting setting_;
 
 		void AddStop(std::string_view name, geo::Coordinates& coordinate);
 		void AddStopRouteLength(std::string_view name, std::list<std::tuple<std::string_view, int>> info);
@@ -27,6 +30,8 @@ namespace transport {
 		int CountRouteLength(const std::vector<domain::Stop*>& stops) const;
 		void AddCrossBusesToStop(const domain::Bus& bus);
 		void CountLength(domain::Bus& bus);
+
+		void SetSetting(size_t bus_velocity, size_t bus_wait_time);
 
 	public:
 		template <typename InputReader>
@@ -38,6 +43,10 @@ namespace transport {
 		const std::map<std::string_view, domain::Stop*>& GetAllStops() const;		
 		const std::map<std::string_view, domain::Bus*>& GetAllBuses() const;
 
+		const domain::Setting GetSetting() const;
+		const std::deque<domain::Bus>& GetDequeBuses() const;
+		const std::deque<domain::Stop>& GetDequeStops() const;
+		size_t GetCountStops() const;
 	};
 
 }  // namespace transport
@@ -55,5 +64,6 @@ void transport::Catalogue::CatalogRequest(InputReader& request) {
 	for (auto& [name, list_stops, is_round] : buses) {
 		AddBus(name, list_stops, is_round);
 	}
+	SetSetting(request.GetSettingsBusVelocity(), request.GetSettingsBusWaitTime());
 
 }

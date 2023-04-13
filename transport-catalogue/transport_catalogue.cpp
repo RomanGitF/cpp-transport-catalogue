@@ -10,9 +10,11 @@ using namespace domain;
 
 void Catalogue::AddStop(std::string_view name, geo::Coordinates& coordinate) {
 	Stop result(name, coordinate.lat, coordinate.lng);
+	result.index__ = stops_.size();
 	stops_.push_back(result);
 	std::string_view tmp = stops_.back().name__;
 	all_stops_.insert(std::make_pair(tmp, &stops_.back()));
+	
 }
 
 void Catalogue::AddStopRouteLength(std::string_view name, std::list<std::tuple<std::string_view, int>> info) {
@@ -34,11 +36,12 @@ void Catalogue::AddBus(std::string_view name, std::list<std::string_view> stops,
 	}
 	stops__.resize(size_vector);
 	int route_length = CountRouteLength(stops__);
-	if (!is_round) { 
+	if (!is_round) {
 		std::vector<Stop*> revers_stops(stops__.rbegin(), stops__.rend());
 		route_length += CountRouteLength(revers_stops);
 	}
-	Bus tmp(name, stops__, uniq_stop.size(), route_length, is_round);
+	size_t index = buses_.size();
+	Bus tmp(name, stops__, uniq_stop.size(), route_length, is_round, index);
 	CountLength(tmp);
 	if (!is_round) { tmp.length__ *= 2; }
 	buses_.push_back(std::move(tmp));
@@ -97,4 +100,25 @@ const std::map<std::string_view, Stop*>& Catalogue::GetAllStops() const {
 
 const std::map<std::string_view, Bus*>& Catalogue::GetAllBuses() const {
 	return all_buses_;
+}
+
+const domain::Setting Catalogue::GetSetting() const {
+	return setting_;
+}
+
+const std::deque<domain::Bus>& Catalogue::GetDequeBuses() const {
+	return buses_;
+}
+
+const std::deque<domain::Stop>& Catalogue::GetDequeStops() const {
+	return stops_;
+}
+
+size_t Catalogue::GetCountStops() const {
+	return stops_.size();
+}
+
+void Catalogue::SetSetting(size_t bus_velocity, size_t bus_wait_time) {
+	setting_.bus_velocity__ = bus_velocity;
+	setting_.bus_wait_time__ = bus_wait_time;
 }
