@@ -1,17 +1,16 @@
 #pragma once
 
 #include <map>
-#include <string_view>
+
 
 #include "domain.h"
 #include "graph.h"
 #include "transport_catalogue.h"
 
 #include "router.h"
+#include "transport_router.pb.h"
 
 using namespace graph;
-
-
 
 namespace transport {
 
@@ -29,12 +28,15 @@ namespace transport {
 	public:
 		BusGraph(Catalogue& catalogue);
 
-		const std::string_view GetNameBus(EdgeId edge_id) const;	
+		const std::string GetNameBus(EdgeId edge_id) const;	
 		int GetSpanCount(EdgeId edge_id) const;
 
 		const BaseGraph& GetGraph() const{
 			return *this;
 		}
+
+		void Serialize(TCProto::BusGraph& proto);
+		void Deserialize(const TCProto::BusGraph& proto);
 
 	private:
 		Catalogue& catalogue_;
@@ -49,13 +51,16 @@ namespace transport {
 	};
 
 	class BusRouter : public BaseRouter {
-		const BusGraph& bus_graph_;
+		BusGraph bus_graph_;
 	public:
 		BusRouter(const BusGraph& bus_graph);
 
 		const Edge<double>& GetEdge(EdgeId edge_id) const;
-		const std::string_view GetNameBus(EdgeId edge_id) const;
+		const std::string GetNameBus(EdgeId edge_id) const;
 		int GetSpanCount(EdgeId edge_id) const;
+
+		void Serialize(TCProto::BusGraph& proto);
+		void Deserialize(TCProto::BusGraph& proto);
 	};
 
 } // namespace transport

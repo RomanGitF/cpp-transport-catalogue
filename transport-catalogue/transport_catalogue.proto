@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+
+package TCProto;
+
+
+message RoadDistanse {
+    string name = 1;
+    uint32 len = 2;
+};
+
+message Stop {
+    string name = 1;
+    double lat = 2;
+    double lng = 3;
+    repeated string bus_name = 4;
+    repeated RoadDistanse road_distanse = 5;
+    uint32 index = 6; 
+};
+
+message Bus {
+    string name = 1;
+    bool is_roundtrip = 2;
+    uint32 index = 3;
+    uint32 unique_stop_count = 4;
+    uint32 route_length = 5;
+    double length = 6;
+    repeated string stops_name = 7;
+};
+
+
+message TransportCatalogue {
+    repeated Stop map_stops = 1;
+    repeated Bus map_buses = 2;
+};

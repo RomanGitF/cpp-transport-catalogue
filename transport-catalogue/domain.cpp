@@ -2,13 +2,13 @@
 
 using namespace domain;
 
-Stop::Stop(std::string_view name, double lat, double lng) {
+Stop::Stop(std::string name, double lat, double lng) {
 	name__ = name;
 	coordinates__.lat = lat;
 	coordinates__.lng = lng;
 }
 
-Bus::Bus(std::string_view name, const std::vector<Stop*>& stopes, size_t count_unique_stops, int route_length, bool is_round, size_t index) {
+Bus::Bus(std::string name, const std::vector<Stop*>& stopes, size_t count_unique_stops, int route_length, bool is_round, size_t index) {
 	route_length__ = route_length;
 	unique_stops__ = count_unique_stops;
 	name__ = name;

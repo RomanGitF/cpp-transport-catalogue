@@ -4,19 +4,21 @@
 #include "request_handler.h"
 
 #include <iostream>
-#include <string_view>
+#include <string>
+
 #include <list>
 #include <memory> 
 
 class JSONReader {
-	using Request_Buses = std::list<std::tuple<std::string_view, std::list<std::string_view>, bool>>;
+	using Request_Buses = std::list<std::tuple<std::string, std::list<std::string>, bool>>;
 
 	json::Document input_;
 
 	std::list<const json::Dict*> stops_;
 	std::list<const json::Dict*> buses_;
 	std::list<const json::Dict*> stats_;
-	std::unique_ptr<json::Dict> settings_;   
+	std::unique_ptr<json::Dict> settings_;  
+	std::unique_ptr<json::Dict> serialization_settings_;     
 
 	void Load();
 
@@ -29,7 +31,9 @@ public:
 	std::list<const json::Dict*>& GetRequestStat();
 
 	json::Dict GetRenderSetting();
+    
 
 	size_t GetSettingsBusVelocity();
 	size_t GetSettingsBusWaitTime();
+    const std::string& GetOutFile() const;
 };

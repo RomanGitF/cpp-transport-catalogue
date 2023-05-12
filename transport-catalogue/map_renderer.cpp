@@ -89,7 +89,7 @@ void MapRenderer::DrawRoute(const std::vector<domain::Stop*> stops, SphereProjec
 	output_.Add(route);
 }
 
-void MapRenderer::DrawName(std::string_view name, svg::Point point, svg::Color color) {
+void MapRenderer::DrawName(std::string name, svg::Point point, svg::Color color) {
 	svg::Text back_text;
 	back_text.SetPosition(point)
 		.SetOffset(set_.bus_label_offset__)
@@ -126,7 +126,7 @@ void MapRenderer::DrawNameRoute(const domain::Bus& bus, SphereProjector& proj, s
 	}
 }
 
-void MapRenderer::DrawSymbolStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj) {
+void MapRenderer::DrawSymbolStop(const std::map<std::string, domain::Stop*>& stops, SphereProjector& proj) {
 	for (const auto& [name, stop] : stops) {
 		if (!stop->cross_buses__.empty()) {
 			svg::Circle circle;
@@ -138,7 +138,7 @@ void MapRenderer::DrawSymbolStop(const std::map<std::string_view, domain::Stop*>
 	}
 }
 
-void MapRenderer::DrawNameStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj) {
+void MapRenderer::DrawNameStop(const std::map<std::string, domain::Stop*>& stops, SphereProjector& proj) {
 	for (const auto& [name, stop] : stops) {
 		if (!stop->cross_buses__.empty()) {
 			svg::Text back_text;
@@ -192,4 +192,50 @@ void MapRenderer::Draw(const transport::Catalogue& catalogue, std::ostream& out)
 	DrawSymbolStop(catalogue.GetAllStops(), proj);
 	DrawNameStop(catalogue.GetAllStops(), proj);
 	output_.Render(out);
+}
+
+void MapRenderer::SerializeSettings(TCProto::RenderSettings& proto) {
+	proto.set_width(set_.width__);
+	proto.set_heigth(set_.heigth__);
+	proto.set_padding(set_.padding__);
+	proto.set_stop_radius(set_.stop_radius__);
+	proto.set_line_width(set_.line_width__);
+	proto.set_bus_label_font_size(set_.bus_label_font_size__);
+	proto.set_underlayer_width(set_.underlayer_width__);
+	proto.set_stop_label_font_size(set_.stop_label_font_size__);
+	proto.set_bus_label_offset_x(set_.bus_label_offset__.x);
+	proto.set_bus_label_offset_y(set_.bus_label_offset__.y);
+	proto.set_stop_label_offset_x(set_.stop_label_offset__.x);
+	proto.set_stop_label_offset_y(set_.stop_label_offset__.y);
+
+	svg::SerializeColor(set_.underlayer_color__, *proto.mutable_underlayer_color());
+
+	for (const svg::Color& color : set_.color_palette__) {
+		svg::SerializeColor(color, *proto.add_palette());
+	}
+
+}
+
+MapRenderer::SetRender MapRenderer::DeserializeSettings(const TCProto::RenderSettings& proto) {
+	SetRender settings;
+	settings.width__ = proto.width();
+	settings.heigth__ = proto.heigth();
+	settings.padding__ = proto.padding();
+	settings.stop_radius__ = proto.stop_radius();
+	settings.line_width__ = proto.line_width();
+	settings.bus_label_font_size__ = proto.bus_label_font_size();
+	settings.underlayer_width__ = proto.underlayer_width();
+	settings.stop_label_font_size__ = proto.stop_label_font_size();
+	settings.bus_label_offset__.x = proto.bus_label_offset_x();
+	settings.bus_label_offset__.y = proto.bus_label_offset_y();
+	settings.stop_label_offset__.x = proto.stop_label_offset_x();
+	settings.stop_label_offset__.y = proto.stop_label_offset_y();
+
+	settings.underlayer_color__ = svg::DeserializeColor(proto.underlayer_color());
+
+	//settings.color_palette__.reserve(proto.palette_size());
+	for (const auto& color : proto.palette()) {
+		settings.color_palette__.push_back(svg::DeserializeColor(color));
+	}
+	return settings;
 }

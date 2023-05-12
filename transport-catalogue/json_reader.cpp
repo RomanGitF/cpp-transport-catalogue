@@ -42,15 +42,22 @@ void JSONReader::Load() {
 	catch (std::out_of_range const& exc) {
 		std::cerr << "Error Load Settings" << std::endl;
 	}
+    
+    try { 
+		serialization_settings_ = std::make_unique<json::Dict>(requests.at("serialization_settings").AsDict());
+	}
+	catch (std::out_of_range const& exc) {
+		std::cerr << "Error Serialization Settings" << std::endl;
+	}
 
 }
 
 std::list<StopRequest> JSONReader::GetRequestStops() {
 	std::list<StopRequest> stops_request;
 	for (const auto& stop : stops_) {
-		std::string_view name = stop->at("name").AsString();
+		std::string name = stop->at("name").AsString();
 		geo::Coordinates coordinates(stop->at("latitude").AsDouble(), stop->at("longitude").AsDouble());
-		std::list<std::tuple<std::string_view, int>> length;
+		std::list<std::tuple<std::string, int>> length;
 		for (const auto& other_stop : stop->at("road_distances").AsDict()) {
 			length.emplace_front(other_stop.first, other_stop.second.AsInt());
 		}
@@ -62,10 +69,10 @@ std::list<StopRequest> JSONReader::GetRequestStops() {
 JSONReader::Request_Buses JSONReader::GetRequestBuses() {
 	Request_Buses buses_request;
 	for (const auto& bus : buses_) {
-		std::string_view name = bus->at("name").AsString();
+		std::string name = bus->at("name").AsString();
 		bool is_round = bus->at("is_roundtrip").AsBool();
-		std::list<std::string_view> stops;
-		std::list<std::string_view> revers_stops;
+		std::list<std::string> stops;
+		std::list<std::string> revers_stops;
 		for (const auto& stop : bus->at("stops").AsArray()) {
 			stops.push_back(stop.AsString());
 		}
@@ -79,7 +86,13 @@ std::list<const json::Dict*>& JSONReader::GetRequestStat() {
 }
 
 json::Dict JSONReader::GetRenderSetting() {
-	return input_.GetRoot().AsDict().at("render_settings").AsDict();
+        	try { 
+		return input_.GetRoot().AsDict().at("render_settings").AsDict();
+	}
+	catch (std::out_of_range const& exc) {
+		return input_.GetRoot().AsDict();
+	}
+	
 }
 
 
@@ -89,4 +102,8 @@ size_t  JSONReader::GetSettingsBusVelocity() {
 
 size_t  JSONReader::GetSettingsBusWaitTime() {
 	return settings_.get()->at("bus_wait_time").AsInt();
+}
+
+const std::string& JSONReader::GetOutFile() const{
+    return serialization_settings_.get()->at("file").AsString();
 }

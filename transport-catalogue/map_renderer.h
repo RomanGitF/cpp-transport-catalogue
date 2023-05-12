@@ -15,6 +15,8 @@
 #include "transport_catalogue.h"
 #include "domain.h"
 
+#include "map_renderer.pb.h"
+
 inline const double EPSILON = 1e-6;
 bool IsZero(double value);
 
@@ -51,6 +53,8 @@ class MapRenderer {
         svg::Color underlayer_color__;
 
         SetRender(const json::Dict& render_settings);
+        SetRender() = default;
+        
     };
 
     SetRender set_;
@@ -59,14 +63,18 @@ class MapRenderer {
     void DrawRoute(const std::vector<domain::Stop*> stops,
         SphereProjector& proj, svg::Color color, bool is_round); 
     
-    void DrawName(std::string_view name, svg::Point point, svg::Color color);
+    void DrawName(std::string name, svg::Point point, svg::Color color);
     void DrawNameRoute(const domain::Bus& bus, SphereProjector& proj, svg::Color color);
-    void DrawSymbolStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj);
-    void DrawNameStop(const std::map<std::string_view, domain::Stop*>& stops, SphereProjector& proj);
+    void DrawSymbolStop(const std::map<std::string, domain::Stop*>& stops, SphereProjector& proj);
+    void DrawNameStop(const std::map<std::string, domain::Stop*>& stops, SphereProjector& proj);
 
 public:
+
     MapRenderer(const json::Dict& render_settings);
     void Draw(const transport::Catalogue& catalogue, std::ostream& out);
+
+    void SerializeSettings(TCProto::RenderSettings& proto);
+    static SetRender DeserializeSettings(const TCProto::RenderSettings& proto);
 };
 
 
@@ -121,5 +129,4 @@ MapRenderer::SphereProjector::SphereProjector(PointInputIt points_begin, PointIn
         zoom_coeff_ = *height_zoom;
     }
 }
-
 

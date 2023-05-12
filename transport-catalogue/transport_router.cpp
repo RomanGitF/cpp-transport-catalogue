@@ -11,7 +11,7 @@ BusGraph::BusGraph(Catalogue& catalogue)
 	BuildGraph();
 }
 
-const std::string_view BusGraph::GetNameBus(EdgeId edge_id) const {
+const std::string BusGraph::GetNameBus(EdgeId edge_id) const {
 	size_t index = items_.at(edge_id).index_bus__;
 	return catalogue_.GetDequeBuses().at(index).name__;
 }
@@ -58,6 +58,28 @@ void BusGraph::BuildGraph() {
 	}
 }
 
+void BusGraph::Serialize(TCProto::BusGraph& proto) {
+	proto.set_bus_wait_time(setting_.bus_wait_time__);
+	proto.set_bus_velocity(setting_.bus_velocity__);
+
+	for (auto& [edge, item] : items_) {
+		TCProto::Item& proto_item = *proto.add_items();
+		proto_item.set_edge_id(edge);
+		proto_item.set_edge_id(item.index_bus__);
+		proto_item.set_edge_id(item.span_count__);
+	}
+}
+
+void BusGraph::Deserialize(const TCProto::BusGraph & proto) {
+	setting_ = { proto.bus_wait_time(), proto.bus_velocity() };
+
+    for (const auto& proto_item : proto.items()) {
+        Item item = { proto_item.index_bus(), proto_item.span_count() };
+        EdgeId edge = proto_item.edge_id();
+        items_.insert(std::make_pair(edge, item));
+    }
+}
+
 ////////////// class BusRouter
 BusRouter::BusRouter(const BusGraph& bus_graph)
 	:BaseRouter(bus_graph.GetGraph())
@@ -68,10 +90,19 @@ const Edge<double>& BusRouter::GetEdge(EdgeId edge_id) const {
 	return bus_graph_.GetEdge(edge_id);
 }
 
-const std::string_view BusRouter::GetNameBus(EdgeId edge_id) const {
+const std::string BusRouter::GetNameBus(EdgeId edge_id) const {
 	return bus_graph_.GetNameBus(edge_id);
 }
 
 int BusRouter::GetSpanCount(EdgeId edge_id) const {
 	return bus_graph_.GetSpanCount(edge_id);
+}
+
+void BusRouter::Serialize(TCProto::BusGraph& proto) {
+	bus_graph_.Serialize(proto);
+}
+
+void BusRouter::Deserialize(TCProto::BusGraph& proto) {
+	bus_graph_.Deserialize(proto);
+
 }

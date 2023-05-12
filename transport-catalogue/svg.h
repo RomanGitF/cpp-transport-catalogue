@@ -8,6 +8,9 @@
 #include <optional>
 #include <variant>
 
+#include "svg.pb.h"
+
+
 namespace svg {
     enum class StrokeLineCap {
         BUTT,
@@ -104,6 +107,9 @@ namespace svg {
         int indent = 0;
     };
 
+    void SerializeColor(const Color& color, SvgProto::Color& proto);
+    Color DeserializeColor(const SvgProto::Color& proto);
+
     class Object {
     public:
         void Render(const RenderContext& context) const;
@@ -176,7 +182,6 @@ namespace svg {
                 out << " stroke-linejoin=\""sv << *stroke_line_join_ << "\""sv;
             }
         }
-
         virtual ~PathProps() = default;
     };
 
@@ -189,8 +194,6 @@ namespace svg {
         Point center_;
         double radius_ = 1.0;
     };
-
-
 
     class Polyline final : public Object, public PathProps<Polyline> {
         std::list<Point> points_;
@@ -242,4 +245,3 @@ namespace svg {
         void Render(std::ostream& out) const;
     };
 }  // namespace svg
-

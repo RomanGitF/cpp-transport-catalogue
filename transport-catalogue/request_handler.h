@@ -13,16 +13,16 @@
 #include "router.h"
 
 class StopRequest {
-    std::string_view name_;
+    std::string name_;
     geo::Coordinates coordinates_;
-    std::list<std::tuple<std::string_view, int>> route_length_stops_ = {};
+    std::list<std::tuple<std::string, int>> route_length_stops_ = {};
 
 public:
-    StopRequest(std::string_view name, geo::Coordinates coordinates, std::list<std::tuple<std::string_view, int>> length);
+    StopRequest(std::string name, geo::Coordinates coordinates, std::list<std::tuple<std::string, int>> length);
 
-    std::string_view GetName();
+    std::string GetName();
     geo::Coordinates& GetCoordinates();
-    std::list<std::tuple<std::string_view, int>> GetRouteLengthStop();
+    std::list<std::tuple<std::string, int>> GetRouteLengthStop();
 };
 
 class RequestHandler {
@@ -39,10 +39,10 @@ class RequestHandler {
 
     json::Node GetMap(int id);
 
-    std::pair<size_t, size_t> FindIndexStops(std::string_view from, std::string_view to);
+    std::pair<size_t, size_t> FindIndexStops(std::string from, std::string to);
     json::Node GetArrayItems(const std::vector<graph::EdgeId> edges);
 public:
-
+            //RequestHandler(transport::Catalogue& catalogue);
     RequestHandler(transport::Catalogue& catalogue, MapRenderer& render);
     void GetStat(std::list<const json::Dict*> requests, std::ostream& out);
 };

@@ -10,23 +10,25 @@
 namespace domain {
 
 	struct Stop {
-		Stop(std::string_view name, double lat, double lng);
+        Stop() = default;
+		Stop(std::string name, double lat, double lng);
 
-		std::unordered_map<std::string_view, int> route_length__;
-		std::set<std::string_view> cross_buses__;
-		std::string_view name__;
+		std::unordered_map<std::string, int> route_length__;
+		std::set<std::string> cross_buses__;
+		std::string name__;
 		geo::Coordinates coordinates__;
 		size_t index__;
 	};
 
 	struct Bus {
-		Bus(std::string_view name, const std::vector<Stop*>& stopes, size_t CountUniqueStops, int route_length, bool is_round, size_t index);
+        Bus() = default;
+		Bus(std::string name, const std::vector<Stop*>& stopes, size_t CountUniqueStops, int route_length, bool is_round, size_t index);
 
 		int route_length__ = 0;
 		double length__ = 0.0;
 		size_t unique_stops__;
 		bool is_roundtrip__;
-		std::string_view name__;
+		std::string name__;
 		std::vector<Stop*> stops__;
 		size_t index__;
 

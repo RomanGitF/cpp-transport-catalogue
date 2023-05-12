@@ -7,13 +7,13 @@
 using namespace domain;
 using namespace transport;
 
-StopRequest::StopRequest(std::string_view name, geo::Coordinates coordinates, std::list<std::tuple<std::string_view, int>> length) {
+StopRequest::StopRequest(std::string name, geo::Coordinates coordinates, std::list<std::tuple<std::string, int>> length) {
     name_ = name;
     coordinates_ = std::move(coordinates);
     route_length_stops_ = length;
 }
 
-std::string_view StopRequest::GetName() {
+std::string StopRequest::GetName() {
     return name_;
 }
 
@@ -21,7 +21,7 @@ geo::Coordinates& StopRequest::GetCoordinates() {
     return coordinates_;
 }
 
-std::list<std::tuple<std::string_view, int>> StopRequest::GetRouteLengthStop() {
+std::list<std::tuple<std::string, int>> StopRequest::GetRouteLengthStop() {
     return route_length_stops_;
 }
 
@@ -135,7 +135,7 @@ json::Node RequestHandler::GetArrayItems(const std::vector<graph::EdgeId> edges)
         {
             return items;
         }
-        string_view stop = stops.at(it.from).name__;
+        string stop = stops.at(it.from).name__;
         int time_for_wait = catalogue_.GetSetting().bus_wait_time__;
         json::Node item_wait = json::Builder{}
             .StartDict()
@@ -146,7 +146,7 @@ json::Node RequestHandler::GetArrayItems(const std::vector<graph::EdgeId> edges)
             .Build();
 
         double time_for_bus = it.weight - time_for_wait;
-        string_view bus = router_.GetNameBus(it.from);
+        string bus = router_.GetNameBus(it.from);
         int span_count = router_.GetSpanCount(it.from);
         json::Node item_bus = json::Builder{}
             .StartDict()
@@ -162,7 +162,7 @@ json::Node RequestHandler::GetArrayItems(const std::vector<graph::EdgeId> edges)
     return items;
 }
 
-std::pair<size_t, size_t> RequestHandler::FindIndexStops(std::string_view from, string_view to) {
+std::pair<size_t, size_t> RequestHandler::FindIndexStops(std::string from, string to) {
     size_t index_from = catalogue_.GetAllStops().at(from)->index__;
     size_t index_to = catalogue_.GetAllStops().at(to)->index__;
     return make_pair(index_from, index_to);
